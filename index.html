@@ -83,7 +83,24 @@ function update(){
  const original=new Date(pay.getFullYear(),pay.getMonth(),24);el('scholarship-reason').textContent=days===0?'موعد صرف المكافأة اليوم حسب الجدول':original.getDay()===5?'يوم 24 يوافق الجمعة؛ لذلك تُصرف الخميس 23.':original.getDay()===6?'يوم 24 يوافق السبت؛ لذلك تُصرف الأحد 25.':'';
  const key=pay.getFullYear()+'-'+pay.getMonth()+'-'+pay.getDate();if(days===0&&celebratedDate!==key){celebratedDate=key;confetti();sound()}
 }
-update();setInterval(update,60000);
+update();
+let midnightTimer;
+function scheduleMidnightReload() {
+  clearTimeout(midnightTimer);
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  midnightTimer = setTimeout(() => location.reload(), Math.max(1, next - now));
+}
+scheduleMidnightReload();
+let openedOn = new Date().toDateString();
+function reloadIfNewDay() {
+  if (new Date().toDateString() !== openedOn) location.reload();
+  else scheduleMidnightReload();
+}
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) reloadIfNewDay();
+});
+window.addEventListener('focus', reloadIfNewDay);
 // المتصفح قد يمنع الصوت التلقائي إلى أن يتفاعل الزائر مع الصفحة.
 document.addEventListener('pointerdown',()=>{if(celebratedDate)sound()},{once:true});
 </script></body></html>
